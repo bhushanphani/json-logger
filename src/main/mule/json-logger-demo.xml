@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8297ebf5-f71d-4a29-8c86-37dea599fc3d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="d2752ee0-d1c4-4d1a-b1de-589a751c3165" file="api-${mule.env}.properties" />
+	<global-property doc:name="Global Property" doc:id="fa9f9797-ffe4-4f43-8c25-3417ea1e0012" name="mule.env" value="dev" />
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="a7383016-2bb8-40b3-873e-4f2a25937cbc"/>
+	<flow name="json-logger-demoFlow" doc:id="33e37088-6b1b-4d0d-a1a1-b51bc460f66b" >
+		<http:listener doc:name="Listener" doc:id="35cab459-bdf4-4690-a037-8fad70100687" config-ref="HTTP_Listener_config" path="/demo"/>
+		<ee:transform doc:name="Transform Message" doc:id="9ba86a79-6d4c-4e1b-b8eb-7992aa24bce9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logger" doc:id="78047587-b802-4509-8c46-ac2d0e799c75" config-ref="JSON_Logger_Config" message="logger-testing">
+			<json-logger:content ><![CDATA[#[%dw 2.0
+output application/json 
+---
+{
+	payload: payload,
+	attributes: attributes
+}]]]></json-logger:content>
+		</json-logger:logger>
+	</flow>
+</mule>
